@@ -3,10 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class NumberStream extends StatelessWidget {
-  NumberStream({super.key});
+  const NumberStream({super.key});
 
-  final controller = StreamController<int>();
-  int number = 0;
+  Stream<int> numberStream() {
+    int number = 0;
+    final controller = StreamController<int>();
+    Timer.periodic(const Duration(seconds: 1), (Timer timer) {
+      controller.add(number++);
+    });
+    return controller.stream;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,20 +22,13 @@ class NumberStream extends StatelessWidget {
       ),
       body: Center(
         child: StreamBuilder(
-          stream: controller.stream,
+          stream: numberStream(),
           builder: (context, snapshot) {
             if (snapshot.data == null) return const CircularProgressIndicator();
 
             return Text("${snapshot.data}");
           },
         ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          number++;
-          controller.add(number);
-        },
       ),
     );
   }
